@@ -1,63 +1,115 @@
-### Step 1: Ensure/Double Check Permissions on Sensitive Files
+# Step 1: Create, Extract, Compress, and Manage tar Backup Archives
 
-1. Permissions on `/etc/shadow` should allow only `root` read and write access.
+1. Command to **extract** the `TarDocs.tar` archive to the current directory: tar -cvf TarDocs.tar 
 
-    - Command to inspect permissions: ls -l shadow
+2. Command to **create** the `Javaless_Doc.tar` archive from the `TarDocs/` directory, while excluding the `TarDocs/Documents/Java` directory: tar -cf Javaless_Docs.tar TarDocs/Document/
 
-    - Command to set permissions (if needed): sudo chmod 600 shadow
+3. Command to ensure `Java/` is not in the new `Javaless_Docs.ta :  ls Javaless_Docs.tar | grep java
 
-2. Permissions on `/etc/gshadow` should allow only `root` read and write access.
+**Bonus** 
+- Command to create an incremental archive called `logs_backup_tar.gz` with only changed files to `snapshot.file` for the `/var/log` directory:  sudo tar cvf logs_backup.tar.gz var/logs
 
-    - Command to inspect permissions: ls -l gshadow
+#### Critical Analysis Question
 
-    - Command to set permissions (if needed): chmod 600 gshadow
+- Why wouldn't you use the options `-x` and `-c` at the same time with `tar`? you cant create and extract a file at the same time 
 
-3. Permissions on `/etc/group` should allow `root` read and write access, and allow everyone else read access only.
+---
 
-    - Command to inspect permissions: ls -l group
+### Step 2: Create, Manage, and Automate Cron Jobs
 
-    - Command to set permissions (if needed): chmod 644 group 
-    
-4. Permissions on `/etc/passwd` should allow `root` read and write access, and allow everyone else read access only.
+1. Cron job for backing up the `/var/log/auth.log` file: 0 6 * * 3 sudo tar cvvf auth_backup.tgz /var/log/auth.log 
 
-    - Command to inspect permissions: ls -l passwd
+---
 
-    - Command to set permissions (if needed):  chmod 644 passwdadd
+### Step 3: Write Basic Bash Scripts
 
-### Step 2: Create User Accounts
+1. Brace expansion command to create the four subdirectories:  mkdir /backups/{freemem,diskuse,openlist,freedisk}
 
-1. Add user accounts for `sam`, `joe`, `amy`, `sara`, and `admin`.
+2. Paste your `system.sh` script edits below: 
+#!/bin/bash
 
-    - Command to add each user account (include all five users): 
-    - sudo useradd sam, sudo useradd amy, sudo useradd sara, sudo   useradd admin
-  
+free -h > ~/backups/freemem/free_mem.txt
 
-2. Ensure that only the `admin` has general sudo access.
+du -h > ~/backups/diskuse/disk_usage.txt
 
-    - Command to add `admin` to the `sudo` group: sudo usermod -aG sudo admin 
+lsof > ~/backups/openlist/open_list.txt
 
-### Step 3: Create User Group and Collaborative Folder
+df -h > ~/backups/freedisk/free_disk.txt
 
-1. Add an `engineers` group to the system.
 
-    - Command to add group: sudo usermod -aG engineers
+    ```bash
+    #!/bin/bash
+    [Your solution script contents here]
+    ```
 
-2. Add users `sam`, `joe`, `amy`, and `sara` to the managed group.
+3. Command to make the `system.sh` script executable:  chmod +x system.sh
 
-    - Command to add users to `engineers` group (include all four users): sudo usermod -aG engineers sam, sudo usermod -aG engineers joe, sudo usermod -aG engineers amy, sudo usermod -aG engineers sara
 
-3. Create a shared folder for this group at `/home/engineers`.
+**Optional**
+- Commands to test the script and confirm its execution:
 
-    - Command to create the shared folder: mkdir engineers
+**Bonus**
 
-4. Change ownership on the new engineers' shared folder to the `engineers` group.
+- Command to copy `system` to system-wide cron directory: sudo cp system.sh /etc/cron.weekly
 
-    - Command to change ownership of engineer's shared folder to engineer group:  sudo chgrp engineers engineers
+---
 
-### Step 4: Lynis Auditing
+### Step 4. Manage Log File Sizes
+ 
+1. Run `sudo nano /etc/logrotate.conf` to edit the `logrotate` configuration file. 
 
-1. Command to install Lynis: sudo apt install lynis
+    Configure a log rotation scheme that backs up authentication messages to the `/var/log/auth.log`.
 
-2. Command to see documentation and instructions: cd lynis, cat default.prf
+    - Add your config file edits below: 
 
-3. Command to run an audit: sudo lynis --auditor cisco
+    ```bash /var/log/auth.log {weekly/rotate7/notifempty/delaycompression/missingok}
+
+    [Your logrotate scheme edits here]
+    ```
+---
+
+### Bonus: Check for Policy and File Violations
+
+1. Command to verify `auditd` is active: systemctl status auditd
+
+
+2. Command to set number of retained logs and maximum log file size:
+         sudo nano /etc/audit/auditd.conf
+
+    - Add the edits made to the configuration file below: 
+
+    ```bash                                                                                                                                                                                                    max_log_file = 35
+num_logs = 7
+
+    [Your solution edits here]
+    ```
+
+3. Command using `auditd` to set rules for `/etc/shadow`, `/etc/passwd` and `/var/log/auth.log`:
+sudo nano /etc/audit/rules.d/audit.rules
+
+
+    - Add the edits made to the `rules` file below:
+-w /etc/shawdow -p wra -k hashpass_audit       -w /etc/passwd  -p wra -k userpass_audit
+-w /var/log/auth.log -p wra -k authlog_audit
+
+    ```bash
+    [Your solution edits here]
+    ```
+
+4. Command to restart `auditd`: sudo systemctl restart auditd
+ 
+
+5. Command to list all `auditd` rules: sudo auditctl -l
+
+
+6. Command to produce an audit report: sudo aureport -au
+
+
+7. Create a user with `sudo useradd attacker` and produce an audit report that lists account modifications:       sudo useradd attacker sudo aureport -m
+
+
+8. Command to use `auditd` to watch `/var/log/cron`: sudo auditctl -w /var/log/cron
+
+
+9. Command to verify `auditd` rules: sudo auditctl -l
+
