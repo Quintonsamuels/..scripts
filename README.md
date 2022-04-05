@@ -5,7 +5,7 @@ This Repository consist of lynix script soultions that Ive covered in this cours
 the files have been tested and used to generate a live ELK deployment on Azure, and can be use to create another deployment of the image above.
 in order to install portions of the ansible file (click the links below).
 
-## Enter Ansible File
+### Enter Ansible File
 
 -https://github.com/Quintonsamuels/..scripts/tree/main/ansible
 
@@ -14,124 +14,25 @@ The following details are located in this file:
 - POLICIES ACCESS
 - Description of the Topology
 
-## ELK Configuration 
-### Elk Configuration
+### ELK Configuration 
 
-Ansible was used to automate configuration of the ELK machine. No configuration was performed manually, which is advantageous because - System installation and updates can be done efficiently.
+Using Ansible to automate configuration of the ELK machine. There is an advantage becuase nothing was carried out manually, So the system updates can be used 
+expertly 
 
-- What is the main advantage of automating configuration with Ansible? -  Ansible is very easy to set up and use, easy to read, no special coding skills are needed, and is open source (free).             
-
-The playbook implements the following tasks:
-
-- [Install-ELK](Ansible/Install-elk.yml) 
-
-- In 3-5 bullets, explain the steps of the ELK installation play. E.g., install Docker; download image; etc:
+the following 5 steps are used to Install ELK, Install Docker & etc. :
 - - name: set maximum map count in sysctl/systemd
 - - name: docker.io
 - - name: instal pip3
 - - name: Install Docker module
 - - name: download and launch elk
 
-The following screenshot displays the result of running `docker ps` after successfully configuring the ELK instance.
+The scripts above list the solutions  of running "docker.io" after configuring the ELk instance successfully.
 
-![](Images/docker%20ps.png)
+### Access Polcies 
 
-### Target Machines & Beats
+Do to the internal Network the machines are not exposed to the public internet.
+only the jumpbox machine is capable to connect to the internet, But to access the machine you must be allowed through the IP addresses.
 
-This ELK server is configured to monitor the following machines:
-
-- List the IP addresses of the machines you are monitoring:   Web-1 10.0.0.5 ,  Web-2 10.0.0.6
-
-We have installed the following Beats on these machines:
--Specify which Beats you successfully installed: Filebeat , Metricbeat
-
-These Beats allow us to collect the following information from each machine:
--In 1-2 sentences, explain what kind of data each beat collects, and provide 1 example of what you expect to see. E.g., `Winlogbeat` collects Windows logs, which we use to track user logon events, etc.
-
-- Filebeat: Monitors log files and collects log events and then forwards them to Elasticsearch, or Logstash, or any other specified destination. The filebeat would look at the log events and send them to ELK-Stack VM. 
-
-- Metricbeat: Takes the metrics and statistics collected and sends them out to programs such as Elasticsearch or Logstash, or any other specified destination. The metricbeat would look at the uptime of the system or the system logs.
-
-### Using the Playbook
-In order to use the playbook, you will need to have an Ansible control node already configured. Assuming you have such a control node provisioned: 
-
-- filebeat-playbook.yml playbook nano file - Once the file created, we need to run the command line (ansible-playbook filebeat-playbook.yml)
-
-[filebeat-playbook.yml](Ansible/filebeat-playbook.yml)
-
-- metricbeat-playbook.yml playbook nano file -  Once the file created, we need to run the command line (ansible-playbook metricbeat-playbook.yml)
-
-[metricbeat-playbook.yml](Ansible/metricbeat-playbook.yml)
-
-SSH into the control node and follow the steps below:
-
-- Copy the filebeat-config.yml file to /etc/ansible/files.
-- Update the /etc/ansible /hosts file to include the ip address of the webserversand the elk-stack.
-- Run the playbook, and navigate to: http://[personal vm IP]:5601/app/kibana to check installation.
-
-### Bonus
-
-As a Bonus, provide the specific commands the user will need to run to download the playbook, update the files, etc: 
-
-- Open git bash, then ssh azadmin@jump box ip    <----------(My Azure jump-box)
-- sudo docker container list -a                  <----------(my container name is: boring_raman)
-- sudo docker start boring_raman                 <----------(start my container)
-- docker attach boring_raman                     <----------(attach my container)
-- cd /etc/ansible/                               <----------(to work under ansible file)
-- ssh-keygen to your web server                  <----------(get the ssh_rsa.pub key in order to connect)
-- Create a playbook file                         <----------(use touch to create a nano playbook file)
-- nano hosts                                     <----------(update ip on [webservers][elk][elkservers] Example: 10.1.0.4 ansible_python_interpeter=/usr/bin/python3
-- nano ansible.cfg                               <----------(add remote_user=azadmin to which server you want to use) 
-- run ansible-playbook my-playbook.yml           <----------(ansible-playbook is the command to run the file)
-
-### nano hosts
-
-![](Images/hosts.png)
-
-### nano ansible.cfg
-
-![](Images/ansible_user.png)
-
-### Description of the Topology
-
-The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
-
-Load balancing ensures that the application will be highly available , in addition to restricting access to the network.
-
-- What aspect of security do load balancers protect? - The load balancer protects against DDoS (Denial of service) attacks, SSL offload, authenticate user ID, protects applications from threats, traffic compression, and traffic cashing.
-  
-- What is the advantage of a jump box? - Acts as an audit for traffic and a single point where we can manage user accounts.
-
-
-Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the data and system logs.
-
-- What does Filebeat watch for? - Filebeat monitors for log files, collects log events, and forwards that information to Elasticsearch, or Longstash for indexing.
-
-- What does Metricbeat record? -  Metricbeat records metrics and statistics, and sends the output to programs such as Elasticsearch or Logstash. 
-
- 
-
-The configuration details of each machine may be found below.
-_Note: Use the [Markdown Table Generator](http://www.tablesgenerator.com/markdown_tables) to add/remove values from the table_.
-
-| Name     | Function         | IP Address | Operating System |
-|----------|----------------- |------------|------------------|
-| Jump Box | Gateway          | 10.0.0.4   | Linux            |
-| Web-1    | Server           | 10.0.0.5   | Linux            |
-| Web-2    | Server           | 10.0.0.6   | Linux            |
-| ELK-Stack| monitoring Server| 10.1.0.4   | Linux            |
-
-### Access Policies
-
-The machines on the internal network are not exposed to the public Internet. 
-
-Only the jump box machine can accept connections from the Internet. Access to this machine is only allowed from the following IP addresses:
-- Add whitelisted IP addresses - Personal public IP address
-
-
-- Machines within the network can only be accessed by - jump box provitioner.
-- Which machine did you allow to access your ELK VM? - jump box provitioner.
-- What was its IP address? - 10.1.0.4
 - The Jump-Box-provitioner is able to connect via SSH to the Elk-Stack machine through port 22. In addition the Personal Host IP address is also able to access the Elk-Stack    machine through port 5601
 
 
@@ -144,4 +45,30 @@ A summary of the access policies in place can be found in the table below.
 | Web-2    | No                  | 10.0.0.6              |
 | ELK-Stack| yes/No              | Public IP, 10.1.0.4   |
 | Load-bal | Yes                 | 20.124.200.176        |
+
+### Description of the Topology
+
+The main purpose of this network is to expose a load-balanced and monitored instance of DVWA, the D*mn Vulnerable Web Application.
+
+Load balancing ensures that the application will be highly available , in addition to restricting access to the network.
+
+The load balancer protects against DDoS (Denial of service) attacks, SSL offload, authenticate user ID, protects applications from threats, traffic compression, and traffic cashing.
+  
+ Acts as an audit for traffic and a single point where we can manage user accounts.
+
+Integrating an ELK server allows users to easily monitor the vulnerable VMs for changes to the data and system logs.
+
+ The configuration details of each machine may be found below.
+
+
+| Name     | Function         | IP Address | Operating System |
+|----------|----------------- |------------|------------------|
+| Jump Box | Gateway          | 10.0.0.4   | Linux            |
+| Web-1    | Server           | 10.0.0.5   | Linux            |
+| Web-2    | Server           | 10.0.0.6   | Linux            |
+| ELK-Stack| monitoring Server| 10.1.0.4   | Linux            |
+
+
+
+
 
